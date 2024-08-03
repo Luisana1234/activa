@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Order</title>
+    <link rel="stylesheet" th:href="@{/css/buttonsAdd.css}" type="text/css">
+</head>
+<body>
+<div class="form">
+    <h2>Add Order Data</h2>
+    <hr>
+    <form th:action="@{/api/order/create}" method="post" id="addOrderForm">
+        <label for="Request_Code">Request Code</label>
+        <input type="text" id="Request_Code" name="requestCode" required>
+
+        <label for="Order_Number">Order Number</label>
+        <input type="text" id="Order_Number" name="orderNumber" required>
+
+        <label for="Order_Advisor">Order Advisor</label>
+        <input type="text" id="Order_Advisor" name="orderAdvisor" required>
+
+        <label for="Order_Approved">Order Approved</label>
+        <input type="text" id="Order_Approved" name="orderApproved" required>
+
+        <label for="Order_Production_Date">Order Production Date</label>
+        <input type="text" id="Order_Production_Date" name="orderProductionDate" required>
+
+        <label for="Order_Arrival_Date">Order Arrival Date</label>
+        <input type="text" id="Order_Arrival_Date" name="orderArrivalDate" required>
+
+        <br />
+        <input class="submit" type="submit" value="Add">
+    </form>
+</div>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/order'">Back</button>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addOrderForm = document.getElementById("addOrderForm");
+
+        addOrderForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const newOrder = {
+                requestCode: document.getElementById("Request_Code").value,
+                orderNumber: document.getElementById("Order_Number").value,
+                orderAdvisor: document.getElementById("Order_Advisor").value,
+                orderApproved: document.getElementById("Order_Approved").value,
+                orderProductionDate: document.getElementById("Order_Production_Date").value,
+                orderArrivalDate: document.getElementById("Order_Arrival_Date").value
+            };
+
+            fetch("/api/order/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newOrder)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert("Order added successfully!");
+                window.location.href = "/api/order";
+            })
+            .catch(error => {
+                console.error("Error adding order:", error);
+            });
+        });
+    });
+</script>
+</body>
+</html>
+

@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://wwww.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer</title>
+    <link rel="stylesheet" th:href="@{/css/adminTableStyles.css}" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+<header>
+    <div class="panel">
+        <div class="information">
+            <img th:src="@{/img/logoactiva.png}" alt="Activa"/>
+            <h1>ACTIVA</h1>
+        </div>
+        <hr>
+        <div class="menu">
+            <nav>
+                <ul>
+                    <li><a th:href="@{/api/admin}" id="buttonadminTable"> Home</a></li>
+                    <li><a th:href="@{/api/product}" id="buttonProducts">Products</a></li>
+                    <li><a th:href="@{/api/size}" id="buttonSizes">Sizes</a></li>
+                    <li><a th:href="@{/api/measure}" id="buttonMeasurement">Measurement</a></li>
+                    <li><a th:href="@{/api/lineType}" id="buttonLineType">Line Type</a></li>
+                    <li><a th:href="@{/api/fabric}" id="buttonFabric">Fabric</a></li>
+                    <li><a th:href="@{/api/color}" id="buttonColor">Color</a></li>
+                    <li><a th:href="@{/api/group}" id="buttonGroup">Group</a></li>
+                    <li><a th:href="@{/api/order}" id="buttonOrders">Orders</a></li>
+                    <li><a th:href="@{/api/customerGroup}" id="buttonCustomer_group">Customer group</a></li>
+                    <li><a th:href="@{/api/detail}" id="buttonDetail">Detail</a></li>
+                    <li><a th:href="@{/api/fabriColor}" id="buttonFabric_color">Fabric color</a></li>
+                    <li><a th:href="@{/api/refProduct}" id="buttonProduct_reference">Product reference</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/customer/addCustomer'">Add Customer</button>
+
+<table>
+    <thead>
+    <tr>
+        <th>Customer Code</th>
+        <th>Customer ID</th>
+        <th>Customer Name</th>
+        <th>Customer Last Name</th>
+        <th>Customer Address</th>
+        <th>Customer Contact</th>
+        <th>Customer Phone</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="customer : ${customers}">
+        <td data-field="customerCode"> <span class="customerCode" th:text="${customer.id}"></span></td>
+        <td data-field="customerId"> <span class="customerId" th:text="${customer.customerId}"></span></td>
+        <td data-field="customerName"> <span class="customerName" th:text="${customer.customerName}"></span></td>
+        <td data-field="customerLastName"> <span class="customerLastName" th:text="${customer.customerLastName}"></span></td>
+        <td data-field="customerAddress"> <span class="customerAddress" th:text="${customer.customerAddress}"></span></td>
+        <td data-field="customerContact"> <span class="customerContact" th:text="${customer.customerContact}"></span></td>
+        <td data-field="customerPhone"> <span class="customerPhone" th:text="${customer.customerPhone}"></span></td>
+        <td>
+            <button class="btn-action editBtn">Editar</button>
+            <button class="btn-action deleteBtn">Eliminar</button>
+            <button class="btn-action saveBtn" style="display:none;">Guardar</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+   const customerTable = document.querySelector("table tbody");
+
+   customerTable.addEventListener("click", function(event) {
+       const target = event.target;
+
+       // Check if edit button was clicked
+       if (target.classList.contains("editBtn")) {
+           const customerRow = target.closest("tr");
+           // Hide edit buttons and show save button
+           customerRow.querySelector(".editBtn").style.display = "none";
+           customerRow.querySelector(".deleteBtn").style.display = "none";
+           customerRow.querySelector(".saveBtn").style.display = "inline-block";
+           // Enable field editing
+           customerRow.querySelectorAll("td").forEach(td => {
+               const span = td.querySelector("span");
+               if (span) {
+                   const input = document.createElement("input");
+                   input.value = span.textContent;
+                   td.appendChild(input);
+                   span.style.display = "none";
+               }
+           });
+       }
+
+       // Check if save button was clicked
+       if (target.classList.contains("saveBtn")) {
+           const customerRow = target.closest("tr");
+           const customerId = customerRow.querySelector(".customerId").textContent;
+           // Check if all fields are filled
+           const inputs = customerRow.querySelectorAll("input");
+           for (const input of inputs) {
+               if (!input.value.trim()) {
+                   alert("Please fill in all fields before saving.");
+                   return; // Stop saving process if any field is empty
+               }
+           }
+           // Get edited values from the form
+           const editedCustomer = {};
+           customerRow.querySelectorAll("td").forEach((td, index) => {
+               const input = td.querySelector("input");
+               if (input) {
+                   const fieldName = td.getAttribute("data-field");
+                   if (fieldName) {
+                       editedCustomer[fieldName] = input.value;
+                   }
+               }
+           });
+           // Send edited data to server to update the customer
+           fetch(`/api/customer/${customerId}`, {
+               method: "PUT",
+               headers: {
+                   "Content-Type": "application/json"
+               },
+               body: JSON.stringify(editedCustomer)
+           })
+           .then(response => {
+               if (!response.ok) {
+                   throw new Error("Failed to update the customer.");
+               }
+               // Update the table row with the new values
+               customerRow.querySelectorAll("td").forEach(td => {
+                   const span = td.querySelector("span");
+                   const input = td.querySelector("input");
+                   if (span && input) {
+                       span.textContent = input.value;
+                       input.remove();
+                       span.style.display = "";
+                   }
+               });
+               // Show edit and delete buttons, hide save button
+               customerRow.querySelector(".editBtn").style.display = "";
+               customerRow.querySelector(".deleteBtn").style.display = "";
+               customerRow.querySelector(".saveBtn").style.display = "none";
+           })
+           .catch(error => {
+               console.error("Error updating the customer:", error);
+           });
+       }
+
+       // Check if delete button was clicked
+       if (target.classList.contains("deleteBtn")) {
+           const customerRow = target.closest("tr");
+           const customerId = customerRow.querySelector(".customerId").textContent;
+           // Confirm before deleting
+           if (confirm("Are you sure you want to delete this customer?")) {
+               // Send DELETE request to server
+               fetch(`/api/customer/${customerId}`, {
+                   method: "DELETE"
+               })
+               .then(response => {
+                   if (!response.ok) {
+                       throw new Error("Error deleting the customer.");
+                   }
+                   customerRow.remove();
+               })
+               .catch(error => {
+                   console.error("Error deleting the customer:", error);
+               });
+           }
+       }
+   });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://wwww.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Home</title>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+        <link rel="stylesheet" th:href="@{/css/adminTableStyles.css}" type="text/css" >
+        <script
+            src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <script src="/js/ChargeData.js"></script>
+        <header>
+            <div class="panel">
+                <div class="information">
+                    <img th:src="@{/img/logoactiva.png}" alt="Activa"/>
+                    <h1>ACTIVA</h1>
+                </div>
+                <hr>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </header>
+        <div class="container">
+            <div class="panel" id="panel2">
+                <div class="menu" id="menubtn">
+                    <nav>
+                        <ul>
+                            <li><a th:href="@{/api/product}" id="buttonProducts">Products</a></li>
+                            <li><a th:href="@{/api/color}" id="buttonColor">Color</a></li>
+                            <li><a th:href="@{/api/size}" id="buttonSizes">Sizes</a></li>
+                            <li><a th:href="@{/api/measure}" id="buttonMeasurement">Measurement</a></li>
+                            <li><a th:href="@{/api/lineType}" id="buttonLineType">Line Type</a></li>
+                            <li><a th:href="@{/api/fabric}" id="buttonFabric">Fabric</a></li>
+                            <li><a th:href="@{/api/customer}" id="buttonCustomer">Customer</a></li>
+                            <li><a th:href="@{/api/group}" id="buttonGroup">Group</a></li>
+                            <li><a th:href="@{/api/order}" id="buttonOrders">Orders</a></li>
+                            <li><a th:href="@{/api/customerGroup}" id="buttonCustomer_group">Customer group</a></li>
+                            <li><a th:href="@{/api/detail}" id="buttonDetail">Detail</a></li>
+                            <li><a th:href="@{/api/fabriColor}" id="buttonFabric_color">Fabric color</a></li>
+                            <li><a th:href="@{/api/refProduct}" id="buttonProduct_reference">Product reference</a></li>
+                        </ul>
+                    </nav>
+                    
+                </div>
+                
+            </div>
+            
+                 
+                
+        </div>
+
+        <main class="main-container">
+            <div class="main-title">
+              <p class="font-weight-bold"></p>
+            </div>
+            <div class="main-cards">
+              <div class="card">
+                <div class="card-inner">
+                  <p class="text-primary">PRODUCTS</p>
+                  <span class="material-icons-outlined text-blue">inventory_2</span>
+                </div>
+                <span class="text-primary font-weight-bold">249</span>
+              </div>
+              <div class="card">
+                <div class="card-inner">
+                  <p class="text-primary">ORDER ORDERS</p>
+                  <span class="material-icons-outlined text-orange">add_shopping_cart</span>
+                </div>
+                <span class="text-primary font-weight-bold">83</span>
+              </div>
+              <div class="card">
+                <div class="card-inner">
+                  <p class="text-primary">SALES ORDERS</p>
+                  <span class="material-icons-outlined text-green">shopping_cart</span>
+                </div>
+                <span class="text-primary font-weight-bold">79</span>
+              </div>
+              <div class="card">
+                <div class="card-inner">
+                  <p class="text-primary">NEW ORDERS</p>
+                  <span class="material-icons-outlined text-red">notification_important</span>
+                </div>
+                <span class="text-primary font-weight-bold">5</span>
+              </div>
+            </div>
+            <div class="charts">
+              <div class="charts-card">
+                <p class="chart-title">Top 5 Costumer</p>
+                <div id="bar-chart"></div>
+              </div>
+              <div class="charts-card">
+                <p class="chart-title">Product reference</p>
+                <div id="area-chart"></div>
+              </div>
+            </div>
+          </main>
+
+    </body>
+   
+</html>

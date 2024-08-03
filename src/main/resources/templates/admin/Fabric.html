@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabric</title>
+    <link rel="stylesheet" th:href="@{/css/adminTableStyles.css}" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+<header>
+    <div class="panel">
+        <div class="information">
+            <img th:src="@{/img/logoactiva.png}" alt="Activa" />
+            <h1>ACTIVA</h1>
+        </div>
+        <hr>
+        <div class="menu">
+            <nav>
+                <ul>
+                    <li><a th:href="@{/api/admin}" id="buttonadminTable"> Home</a></li>
+                    <li><a th:href="@{/api/product}" id="buttonProducts">Products</a></li>
+                    <li><a th:href="@{/api/size}" id="buttonSizes">Sizes</a></li>
+                    <li><a th:href="@{/api/measure}" id="buttonMeasurement">Measurement</a></li>
+                    <li><a th:href="@{/api/lineType}" id="buttonLineType">Line Type</a></li>
+                    <li><a th:href="@{/api/color}" id="buttonColor">Color</a></li>
+                    <li><a th:href="@{/api/customer}" id="buttonCustomer">Customer</a></li>
+                    <li><a th:href="@{/api/group}" id="buttonGroup">Group</a></li>
+                    <li><a th:href="@{/api/order}" id="buttonOrders">Orders</a></li>
+                    <li><a th:href="@{/api/customerGroup}" id="buttonCustomer_group">Customer group</a></li>
+                    <li><a th:href="@{/api/detail}" id="buttonDetail">Detail</a></li>
+                    <li><a th:href="@{/api/fabriColor}" id="buttonFabric_color">Fabric color</a></li>
+                    <li><a th:href="@{/api/refProduct}" id="buttonProduct_reference">Product reference</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/fabric/addFabric'">Add</button>
+
+<table>
+    <thead>
+    <tr>
+        <th>Fabric Code</th>
+        <th>Fabric Type</th>
+        <th>Fabric Composition</th>
+        <th>Fabric Notes</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="fabric : ${fabrics}">
+        <td><span class="fabric-id" th:text="${fabric.id}"></span></td>
+        <td><span class="fabric-type" th:text="${fabric.fabricType}"></span></td>
+        <td><span class="fabric-comp" th:text="${fabric.fabricComposition}"></span></td>
+        <td><span class="fabric-notes" th:text="${fabric.fabricNotes}"></span></td>
+        <td>
+            <button class="btn-action editBtn">Edit</button>
+            <button class="btn-action deleteBtn">Delete</button>
+            <button class="btn-action saveBtn" style="display:none;">Save</button>
+            <button class="btn-action cancelBtn" style="display:none;">Cancel</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    // Reemplazar la fila de la tabla con el formulario de edición
+    function editFabric(fabricRow) {
+        const fabricId = fabricRow.querySelector('.fabric-id').textContent;
+        const fabricType = fabricRow.querySelector('.fabric-type').textContent;
+        const fabricComp = fabricRow.querySelector('.fabric-comp').textContent;
+        const fabricNotes = fabricRow.querySelector('.fabric-notes').textContent;
+
+        const editForm = document.createElement('tr');
+        editForm.innerHTML = `
+            <td><input type="text" class="edit-fabric-id" value="${fabricId}" readonly></td>
+            <td><input type="text" class="edit-fabric-type" value="${fabricType}"></td>
+            <td><input type="text" class="edit-fabric-comp" value="${fabricComp}"></td>
+            <td><input type="text" class="edit-fabric-notes" value="${fabricNotes}"></td>
+            <td>
+                <button class="btn-action saveBtn">Save</button>
+                <button class="btn-action cancelBtn">Cancel</button>
+            </td>
+        `;
+
+        // Reemplazar la fila de la tabla con el formulario de edición
+        fabricRow.replaceWith(editForm);
+
+        // Manejar el evento de guardar cambios
+        editForm.querySelector('.saveBtn').addEventListener('click', () => saveEditedFabric(fabricId));
+
+        // Manejar el evento de cancelar edición
+        editForm.querySelector('.cancelBtn').addEventListener('click', cancelEdit);
+    }
+
+    // Función para guardar los cambios en la tela editada
+    function saveEditedFabric(fabricId) {
+        // Obtener los valores editados del formulario
+        const editedFabric = {
+            fabricType: document.querySelector('.edit-fabric-type').value,
+            fabricComposition: document.querySelector('.edit-fabric-comp').value,
+            fabricNotes: document.querySelector('.edit-fabric-notes').value
+        };
+
+        // Enviar los datos editados al servidor para actualizar la tela
+        fetch(`/api/fabric/${fabricId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(editedFabric)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error updating fabric.");
+            }
+            // Recargar la página después de actualizar exitosamente
+            location.reload();
+        })
+        .catch(error => {
+            console.error("Error updating fabric:", error);
+        });
+    }
+
+    // Función para cancelar la edición y volver a mostrar la fila original de la tabla
+    function cancelEdit() {
+        // Recargar la página sin realizar cambios
+        location.reload();
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const fabricTable = document.querySelector("table tbody");
+
+        fabricTable.addEventListener("click", function(event) {
+            const target = event.target;
+
+            // Verificar si se hizo clic en un botón de editar
+            if (target.classList.contains("editBtn")) {
+                const fabricRow = target.closest("tr");
+                editFabric(fabricRow);
+            }
+
+            // Verificar si se hizo clic en un botón de eliminar
+            if (target.classList.contains("deleteBtn")) {
+                const fabricRow = target.closest("tr");
+                const fabricId = fabricRow.querySelector('.fabric-id').textContent;
+
+                // Confirmar antes de eliminar
+                if (confirm("¿Estás seguro de que quieres eliminar esta tela?")) {
+                    // Enviar solicitud DELETE al servidor
+                    fetch(`/api/fabric/${fabricId}`, {
+                        method: "DELETE"
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Error removing fabric.");
+                        }
+                        // Eliminar la fila de la tabla
+                        fabricRow.remove();
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+
+</html>

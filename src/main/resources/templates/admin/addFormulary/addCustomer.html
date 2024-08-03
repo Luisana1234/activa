@@ -1,0 +1,97 @@
+!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Customer</title>
+    <link rel="stylesheet" th:href="@{/css/buttonsAdd.css}" type="text/css">
+</head>
+
+<body>
+<div class="form">
+    <h2>Add Customer Data</h2>
+    <hr>
+    <form th:action="@{/api/customer/create}" method="post" id="addCustomerForm">
+        <label for="customerCode">Customer Code</label>
+        <input type="text" id="customerCode" name="customerCode" placeholder="Enter code" required>
+
+        <label for="customerId">Customer ID</label>
+        <input type="text" id="customerId" name="customerId" placeholder="Enter customer ID" required>
+
+        <label for="customerName">Customer Name</label>
+        <input type="text" id="customerName" name="customerName" placeholder="Enter customer name" required>
+
+        <label for="customerLastName">Customer Last Name</label>
+        <input type="text" id="customerLastName" name="customerLastName" placeholder="Enter customer last name" required>
+
+        <label for="customerAddress">Customer Address</label>
+        <input type="text" id="customerAddress" name="customerAddress" placeholder="Enter customer address" required>
+
+        <label for="customerContact">Customer Contact</label>
+        <input type="text" id="customerContact" name="customerContact" placeholder="Enter customer contact" required>
+
+        <label for="customerPhone">Customer Phone</label>
+        <input type="text" id="customerPhone" name="customerPhone" placeholder="Enter customer phone" required>
+
+        <br />
+        <input class="submit" type="submit" value="save">
+    </form>
+</div>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/customer'">Back</button>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+   const addCustomerForm = document.getElementById("addCustomerForm");
+
+   addCustomerForm.addEventListener("submit", function (event) {
+       event.preventDefault(); // Evita el envío del formulario por defecto
+
+       // Obtener los valores de los campos del formulario
+       const newCustomerCode = document.getElementById("customerCode").value;
+       const newCustomerId = document.getElementById("customerId").value;
+       const newCustomerName = document.getElementById("customerName").value;
+       const newCustomerLastName = document.getElementById("customerLastName").value;
+       const newCustomerAddress = document.getElementById("customerAddress").value;
+       const newCustomerContact = document.getElementById("customerContact").value;
+       const newCustomerPhone = document.getElementById("customerPhone").value;
+
+       // Crear un objeto con los datos del nuevo cliente
+       const newCustomer = {
+           customerCode: newCustomerCode,
+           customerId: newCustomerId,
+           customerName: newCustomerName,
+           customerLastName: newCustomerLastName,
+           customerAddress: newCustomerAddress,
+           customerContact: newCustomerContact,
+           customerPhone: newCustomerPhone
+       };
+
+       // Enviar la solicitud POST al servidor utilizando Fetch API
+       fetch("/api/customer/create", {
+           method: "POST",
+           headers: {
+               "Content-Type": "application/json"
+           },
+           body: JSON.stringify(newCustomer)
+       })
+       .then(response => {
+           if (!response.ok) {
+               throw new Error("Network response was not ok");
+           }
+           return response.json(); // Devuelve la respuesta en formato JSON
+       })
+       .then(data => {
+           alert("Customer added successfully!");
+           window.location.href = "/api/customer"; // Redirigir a la página de lista de clientes
+       })
+       .catch(error => {
+           console.error("Error adding customer:", error);
+       });
+   });
+});
+</script>
+</body>
+</html>
+

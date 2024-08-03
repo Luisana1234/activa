@@ -1,0 +1,164 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://wwww.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+   <!-- basic -->
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <!-- mobile metas -->
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+   <!-- site metas -->
+   <title>Linea Deportiva</title>
+   <meta name="keywords" content="">
+   <meta name="description" content="">
+   <meta name="author" content="">
+   <!-- bootstrap css -->
+   <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+   <!-- style css -->
+   <link rel="stylesheet" th:href="@{/css/style.css}">
+   <!-- responsive-->
+   <link rel="stylesheet" th:href="@{/css/responsive.css}">
+   <!-- awesome fontfamily -->
+   <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css}">
+   <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+</head>
+<!-- body -->
+
+<body class="main-layout inner_page">
+   <!-- loader  -->
+   <div class="loader_bg">
+      <div class="loader"><img th:src="@{/img/loading.gif}" alt="" /></div>
+   </div>
+   <!-- end loader -->
+   <div id="mySidepanel" class="sidepanel">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+      <a th:href="@{/index}">Home</a>
+      <a th:href="@{/about}">About</a>
+      <a th:href="@{/services}">Services</a>
+      <a th:href="@{/contact}">Contact</a>
+      <a th:href="@{/login}">Login</a>
+      <a th:href="@{/admin}">Admin</a>
+   </div>
+   <!-- header -->
+   <header>
+      <!-- header inner -->
+      <div class="head-top">
+         <div class="container-fluid">
+            <div class="row">
+               <div class="col-sm-3">
+                  <div class="logo f">
+                     <a th:href="@{/index}"><img th:src="@{/img/logo_footer.png}" width="70" height="50" /></a>
+                  </div>
+               </div>
+               <div class="col-sm-9">
+                  <ul class="email text_align_right">
+                     <li class="d_none"> <i  aria-hidden="true"></i>ADMINISTRATIVE LINE</a></li>
+                     <li class="d_none"><i  aria-hidden="true"></i><a
+                         target="_blank"> CUSTOM LINE</a></li>
+
+                     <li class="d_none"> <a th:href="@{/login}"  target="_blank">Login <i class="fa fa-user" aria-hidden="true"></i></a> </li>
+                     <li class="d_none"><i class="fa fa-search" style="cursor: pointer;" aria-hidden="true"></i></li>
+                     <li> <button class="openbtn" onclick="openNav()"><img th:src="@{/img/menu_btn.png}"></button></li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+   </header>
+   <!-- end header -->
+   <!-- catalogo-->
+  
+   <div class="sportscatalog">
+    <div th:each="producto : ${productos}">
+      <div class="producto">
+        <img th:src="${producto.imagen}" alt="Producto">
+        <p th:text="${producto.descripcion}"></p>
+        <div class="product-buttons"></div>
+        <a th:href="@{/detalle/{id}(id=${producto.id})}" class="boton">Detail</a>
+        <a th:href="@{/agregarCarrito/{id}(id=${producto.id})}" class="boton">add to cart</a>
+      </div>
+    </div>
+  </div>
+      </div>
+   </div>
+   </div>
+   <!-- end contact  -->
+   <!-- footer -->
+   <footer>
+      <div class="footer">
+         <div class="container">
+            <div class="row">
+               <div class="col-md-10 offset-md-1">
+                  <ul class="social_icon text_align_center">
+                     <li> <a href="#"><i class="fa fa-facebook-f"></i></a></li>
+                     <li> <a href="#"><i class="fa fa-twitter"></i></a></li>
+                     <li> <a href="#"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a></li>
+                     <li> <a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+                  </ul>
+               </div>
+               <div class="col-md-4 col-sm-6">
+                  <div class="reader">
+                     <a th:href="@{/index}"><img th:src="@{/img/logo_footer.png}" alt="#" /></a>
+                     <p class="padd_flet40">Empresa cucuteña con más de 6 años de experiencia enfocada en el diseño,
+                        confección y comercial</p>
+                  </div>
+               </div>
+               <div class="col-md-2 col-sm-6">
+                  <div class="reader">
+                     <h3>Explore</h3>
+                     <ul class="xple_menu">
+                        <li><a th:href="@{/index}">Home</a></li>
+                        <li><a th:href="@{/about}">About</a></li>
+                        <li><a th:href="@{/services}">Services</a></li>
+                        <li><a th:href="@{/contact}">Contact Us</a></li>
+                     </ul>
+                  </div>
+               </div>
+               <div class="col-md-3 col-sm-6">
+                  <div class="reader">
+                     <h3>Recent Posts</h3>
+                     <ul class="re_post">
+                        <li><img th:src="@{/img/re_img1.jpg}" alt="#" /></li>
+
+                     </ul>
+                  </div>
+               </div>
+               <div class="col-md-3 col-sm-6">
+                  <div class="reader">
+                     <h3>Contact Us</h3>
+                     <p> comercialuniformesactiva@gmail.com <br> "Soluciones personalizadas para cada empresa."</p>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="copyright text_align_center">
+            <div class="container">
+               <div class="row">
+                  <div class="col-md-10 offset-md-1">
+                     <p>Copyright 2024 All Right Reserved By <a th:href="@{https://html.design/}"> </a></p>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </footer>
+   <!-- end footer -->
+   <!-- Javascript files-->
+   <script src="js/jquery.min.js"></script>
+   <script src="js/bootstrap.bundle.min.js"></script>
+   <script src="js/custom.js"></script>
+   <script src="js/jquery-3.0.0.min.js"></script>
+</body>
+
+</html>
+   <script 
+   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8eaHt9Dh5H57Zh0xVTqxVdBFCvFMqFjQ&callback=initMap">
+   </script>
+
+</body>
+
+</html>

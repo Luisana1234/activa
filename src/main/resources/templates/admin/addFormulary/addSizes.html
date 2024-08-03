@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Size Add</title>
+    <link rel="stylesheet" th:href="@{/css/buttonsAdd.css}" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+<div class="form">
+    <h2>Add Size Data</h2>
+    <hr>
+    <form th:action="@{/api/size/create}" method="post" th:object="${size}" id="addSizeForm">
+        <label for="Size_Value">Size Value</label>
+        <input type="text" id="Size_Value" name="sizeValue" placeholder="Type here" required>
+
+        <label for="Size_Notes">Size Notes</label>
+        <input type="text" id="Size_Notes" name="sizeNotes" placeholder="Type here" required>
+
+        <label for="Size_Specifications">Size Specifications</label>
+        <input type="text" id="Size_Specifications" name="sizeSpecifications" placeholder="Type here" required>
+
+        <br />
+        <input class="submit" type="submit" value="ADD">
+    </form>
+</div>
+
+<button onclick="redirectToSize()">Go to Size</button>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addSizeForm = document.getElementById("addSizeForm");
+
+        addSizeForm.addEventListener("submit", function (event) {
+            event.preventDefault(); // Evita el envío del formulario por defecto
+
+            // Obtener los valores de los campos del formulario
+            const sizeValue = document.getElementById("Size_Value").value;
+            const sizeNotes = document.getElementById("Size_Notes").value;
+            const sizeSpecifications = document.getElementById("Size_Specifications").value;
+
+            // Crear un objeto con los datos del nuevo tamaño
+            const newSize = {
+                sizeValue: sizeValue,
+                sizeNotes: sizeNotes,
+                sizeSpecifications: sizeSpecifications
+            };
+
+            // Enviar la solicitud POST al servidor utilizando Fetch API
+            fetch("/api/size/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newSize)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json(); // Devuelve la respuesta en formato JSON
+                })
+                .then(data => {
+                    alert("Size added successfully!");
+                    // Redirigir o realizar alguna acción adicional después de agregar el tamaño
+                    window.location.href = "/api/size"; // Ejemplo: Redirigir a la página principal de tamaños
+                })
+                .catch(error => {
+                    console.error("Error adding size:", error);
+                });
+        });
+    });
+</script>
+</body>
+</html>

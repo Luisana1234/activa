@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+    <link rel="stylesheet" th:href="@{/css/adminTableStyles.css}" type="text/css">
+</head>
+<body>
+<header>
+    <div class="panel">
+        <div class="information">
+            <img th:src="@{/img/logoactiva.png}" alt="Activa"/>
+            <h1>ACTIVA</h1>
+        </div>
+        <hr>
+        <div class="menu">
+            <nav>
+                <ul>
+                    <li><a th:href="@{/api/admin}" id="buttonadminTable"> Home</a></li>
+                    <li><a th:href="@{/api/product}" id="buttonProducts">Products</a></li>
+                    <li><a th:href="@{/api/size}" id="buttonSizes">Sizes</a></li>
+                    <li><a th:href="@{/api/measure}" id="buttonMeasurement">Measurement</a></li>
+                    <li><a th:href="@{/api/lineType}" id="buttonLineType">Line Type</a></li>
+                    <li><a th:href="@{/api/fabric}" id="buttonFabric">Fabric</a></li>
+                    <li><a th:href="@{/api/customer}" id="buttonCustomer">Customer</a></li>
+                    <li><a th:href="@{/api/group}" id="buttonGroup">Group</a></li>
+                    <li><a th:href="@{/api/color}" id="buttonColor">Color</a></li>
+                    <li><a th:href="@{/api/customerGroup}" id="buttonCustomer_group">Customer group</a></li>
+                    <li><a th:href="@{/api/detail}" id="buttonDetail">Detail</a></li>
+                    <li><a th:href="@{/api/fabriColor}" id="buttonFabric_color">Fabric color</a></li>
+                    <li><a th:href="@{/api/refProduct}" id="buttonProduct_reference">Product reference</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/order/addOrder'">Add</button>
+
+<table>
+    <thead>
+    <tr>
+        <th>Order Code</th>
+        <th>Request Code</th>
+        <th>Order Number</th>
+        <th>Order Advisor</th>
+        <th>Order Approved</th>
+        <th>Order Production Date</th>
+        <th>Order Arrival Date</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="order : ${orders}">
+        <td><span class="order-id" th:text="${order.id}"></span></td>
+        <td><span class="order-code" th:text="${order.requestCode}"></span></td>
+        <td><span class="order-num" th:text="${order.orderNumber}"></span></td>
+        <td><span class="order-adv" th:text="${order.orderAdvisor}"></span></td>
+        <td><span class="order-apr" th:text="${order.orderApproved}"></span></td>
+        <td><span class="order-date" th:text="${order.orderProductionDate}"></span></td>
+        <td><span class="order-arrival" th:text="${order.orderArrivalDate}"></span></td>
+        <td>
+            <button class="btn-action editBtn" onclick="editOrder(this)">Editar</button>
+            <button class="btn-action deleteBtn">Eliminar</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+        function editOrder(button) {
+            const row = button.closest("tr");
+            const orderId = row.querySelector('.order-id').textContent;
+            const requestCode = row.querySelector('.order-code').textContent;
+            const orderNumber = row.querySelector('.order-num').textContent;
+            const orderAdvisor = row.querySelector('.order-adv').textContent;
+            const orderApproved = row.querySelector('.order-apr').textContent;
+            const orderProductionDate = row.querySelector('.order-date').textContent;
+            const orderArrivalDate = row.querySelector('.order-arrival').textContent;
+
+            const editForm = `
+                <td><input type="text" class="edit-order-id" value="${orderId}" readonly></td>
+                <td><input type="text" class="edit-order-code" value="${requestCode}"></td>
+                <td><input type="text" class="edit-order-num" value="${orderNumber}"></td>
+                <td><input type="text" class="edit-order-adv" value="${orderAdvisor}"></td>
+                <td><input type="text" class="edit-order-apr" value="${orderApproved}"></td>
+                <td><input type="text" class="edit-order-date" value="${orderProductionDate}"></td>
+                <td><input type="text" class="edit-order-arrival" value="${orderArrivalDate}"></td>
+                <td>
+                    <button class="btn-action saveBtn" onclick="saveEditedOrder(${orderId})">Save</button>
+                    <button class="btn-action cancelBtn" onclick="cancelEdit()">Cancel</button>
+                </td>
+            `;
+            row.innerHTML = editForm;
+        }
+
+        function saveEditedOrder(orderId) {
+            const editedOrder = {
+                requestCode: document.querySelector('.edit-order-code').value,
+                orderNumber: document.querySelector('.edit-order-num').value,
+                orderAdvisor: document.querySelector('.edit-order-adv').value,
+                orderApproved: document.querySelector('.edit-order-apr').value,
+                orderProductionDate: document.querySelector('.edit-order-date').value,
+                orderArrivalDate: document.querySelector('.edit-order-arrival').value
+            };
+
+            fetch(`/api/order/${orderId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(editedOrder)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to update order.");
+                }
+                loadOrders();
+            })
+            .catch(error => {
+                console.error("Error updating order:", error);
+            });
+        }
+
+        function cancelEdit() {
+            loadOrders();
+        }
+
+        function loadOrders() {
+            window.location.reload();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const orderTable = document.querySelector("table tbody");
+
+            orderTable.addEventListener("click", function (event) {
+                const target = event.target;
+
+                if (target.classList.contains("deleteBtn")) {
+                    const orderId = target.closest("tr").querySelector('.order-id').textContent;
+
+                    if (confirm("Are you sure you want to delete this order?")) {
+                        fetch(`/api/order/${orderId}`, {
+                            method: "DELETE"
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Error deleting the order");
+                            }
+                            target.closest("tr").remove();
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

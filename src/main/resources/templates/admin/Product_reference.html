@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://wwww.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Reference</title>
+    <link rel="stylesheet" th:href="@{/css/adminTableStyles.css}" type="text/css" >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+<header>
+    <div class="panel">
+        <div class="information">
+            <img th:src="@{/img/logoactiva.png}" alt="Activa"/>
+            <h1>ACTIVA</h1>
+        </div>
+        <hr>
+        <div class="menu">
+            <nav>
+                <ul>
+                    <li><a th:href="@{/api/admin}" id="buttonadminTable"> Home</a></li>
+                    <li><a th:href="@{/api/product}" id="buttonProducts">Products</a></li>
+                    <li><a th:href="@{/api/size}" id="buttonSizes">Sizes</a></li>
+                    <li><a th:href="@{/api/measure}" id="buttonMeasurement">Measurement</a></li>
+                    <li><a th:href="@{/api/lineType}" id="buttonLineType">Line Type</a></li>
+                    <li><a th:href="@{/api/fabric}" id="buttonFabric">Fabric</a></li>
+                    <li><a th:href="@{/api/customer}" id="buttonCustomer">Customer</a></li>
+                    <li><a th:href="@{/api/group}" id="buttonGroup">Group</a></li>
+                    <li><a th:href="@{/api/order}" id="buttonOrders">Orders</a></li>
+                    <li><a th:href="@{/api/customerGroup}" id="buttonCustomer_group">Customer group</a></li>
+                    <li><a th:href="@{/api/detail}" id="buttonDetail">Detail</a></li>
+                    <li><a th:href="@{/api/fabriColor}" id="buttonFabric_color">Fabric color</a></li>
+                    <li><a th:href="@{/api/color}" id="buttonColor">Color</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+<button  class="btn-action addBtn" onclick="window.location.href='/api/refProduct/addProductRef'">add</button>
+
+<!-- Aquí empieza la tabla donde se mostrarán los datos -->
+<table>
+    <thead>
+    <tr>
+        <th>Product Ref Code</th>
+        <th>Description</th>
+        <th>Photo</th>
+        <th>Product Code</th>
+        <th>Line Code</th>
+        <th>Size Code</th>
+        <th>Measure Code</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="refProduct : ${refProducts}">
+        <td><span class="refProduct-code" th:text="${refProduct.productRefCode}"></span></td>
+        <td><span class="refProduct-desc" th:text="${refProduct.description}"></span></td>
+        <td><span class="refProduct-photo" th:text="${refProduct.photo}"></span></td>
+        <td><span class="refProduct-product" th:text="${refProduct.productModel}"></span></td>
+        <td><span class="refProduct-line" th:text="${refProduct.lineTypeModel}"></span></td>
+        <td><span class="refProduct-measure" th:text="${refProduct.measureModel}"></span></td>
+        <td><span class="refProduct-size" th:text="${refProduct.sizeModel}"></span></td>
+
+        <td>
+            <button class="btn-action editBtn">Editar</button>
+            <button class="btn-action deleteBtn">Eliminar</button>
+            <button class="btn-action saveBtn" style="display:none;">Guardar</button>
+        </td>
+    </tr>        </tbody>
+</table>
+<!-- Aquí termina la tabla -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const refProductTable = document.querySelector("table tbody");
+
+        refProductTable.addEventListener("click", function(event) {
+            const target = event.target;
+
+            if (target.classList.contains("editBtn")) {
+                const refProductRow = target.closest("tr");
+
+                // Ocultar botones de edición y mostrar botón de guardar
+                refProductRow.querySelector(".editBtn").style.display = "none";
+                refProductRow.querySelector(".deleteBtn").style.display = "none";
+                refProductRow.querySelector(".saveBtn").style.display = "";
+
+                // Habilitar la edición de campos
+                refProductRow.querySelectorAll("td").forEach(td => {
+                    const span = td.querySelector("span");
+                    if (span){
+                        const input = document.createElement("input");
+                        input.value = span.textContent;
+                        td.appendChild(input);
+                        span.style.display = "none";
+                    }
+                });
+            }
+
+            if (target.classList.contains("saveBtn")) {
+                const refProductRow = target.closest("tr");
+                const productRefCode = refProductRow.querySelector(".refProduct-code").textContent;
+                const inputs = refProductRow.querySelectorAll("input");
+                for (const input of inputs) {
+                    if (!input.value.trim()) {
+                        alert("please fill in all the fields before saving.")
+                        return;
+                    }
+                }
+
+                const editedRefProduct = {
+                    productRefCode: inputs[0].value,
+                    description: inputs[1].value,
+                    photo: inputs[2].value,
+                    productModel: inputs[3].value,
+                    lineTypeModel: inputs[4].value,
+                    measureModel: inputs[5].value,
+                    sizeModel: inputs[6].value
+                };
+
+                // Enviar datos editados al servidor para actualizar la referencia de producto
+                fetch(`/api/refProduct/${productRefCode}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(editedRefProduct)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Error updating product reference.");
+                        }
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error("Error updating product reference:", error);
+                    });
+            }
+
+            if (target.classList.contains("deleteBtn")) {
+                const refProductRow = target.closest("tr");
+                const productRefCode = refProductRow.querySelector(".refProduct-code").textContent;
+
+                if (confirm("Are you sure you want to delete this product reference?")) {
+                    // Enviar solicitud DELETE al servidor
+                    fetch(`/api/refProduct/${productRefCode}`, {
+                        method: "DELETE"
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Error deleting product reference.");
+                            }
+                            refProductRow.remove();
+                        })
+                        .catch(error => {
+                            console.error("Error deleting product reference:", error);
+                        });
+                }
+            }
+        });
+    });
+</script>
+</body>
+
+</html>

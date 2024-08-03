@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Add</title>
+    <link rel="stylesheet" th:href="@{/css/buttonsAdd.css}" type="text/css">
+</head>
+
+<body>
+<div class="form">
+    <h2>Add Color Data</h2>
+    <hr>
+    <form th:action="@{/api/detail/create}" method="post" id="addColorForm">
+        <label for="Detail_Code">Detail Code</label>
+        <input type="text" id="Detail_Code" name="detailCode" th:placeholder="#{type_here}" required>
+
+        <label for="Customer_Group_Code">Customer Group Code</label>
+        <input type="text" id="Customer_Group_Code" name="customerGroupCode" th:placeholder="#{type_here}" required>
+
+        <label for="Product_Reference_Code">Product Reference Code</label>
+        <input type="text" id="Product_Reference_Code" name="productReferenceCode" th:placeholder="#{type_here}" required>
+
+        <label for="Opal_Detail">Opal Detail</label>
+        <input type="text" id="Opal_Detail" name="opalDetail" th:placeholder="#{type_here}" required>
+
+        <label for="Combined_Detail">Combined Detail</label>
+        <input type="text" id="Combined_Detail" name="combinedDetail" th:placeholder="#{type_here}" required>
+
+        <label for="Garment_Detail">Garment Detail</label>
+        <input type="text" id="Garment_Detail" name="garmentDetail" th:placeholder="#{type_here}" required>
+
+        <label for="Embroidery_Detail">Embroidery Detail</label>
+        <input type="text" id="Embroidery_Detail" name="embroideryDetail" th:placeholder="#{type_here}" required>
+
+        <label for="Embroidery_Location">Embroidery Location</label>
+        <input type="text" id="Embroidery_Location" name="embroideryLocation" th:placeholder="#{type_here}" required>
+
+        <label for="Color_Code">Color Code</label>
+        <input type="text" id="Color_Code" name="colorCode" th:placeholder="#{type_here}" required>
+
+        <label for="Order_Code">Order Code</label>
+        <input type="text" id="Order_Code" name="orderCode" th:placeholder="#{type_here}" required>
+
+        <br />
+        <input class="submit" type="submit" value="#{add}" th:action="@{/api/detail/create}">
+    </form>
+</div>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/detail'">Back</button>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addColorForm = document.getElementById("addColorForm");
+
+        addColorForm.addEventListener("submit", function (event) {
+            event.preventDefault(); // Evita el envío del formulario por defecto
+
+            // Obtener los valores de los campos del formulario
+            const detailCode = document.getElementById("Detail_Code").value;
+            const customerGroupCode = document.getElementById("Customer_Group_Code").value;
+            const productReferenceCode = document.getElementById("Product_Reference_Code").value;
+            const opalDetail = document.getElementById("Opal_Detail").value;
+            const combinedDetail = document.getElementById("Combined_Detail").value;
+            const garmentDetail = document.getElementById("Garment_Detail").value;
+            const embroideryDetail = document.getElementById("Embroidery_Detail").value;
+            const embroideryLocation = document.getElementById("Embroidery_Location").value;
+            const colorCode = document.getElementById("Color_Code").value;
+            const orderCode = document.getElementById("Order_Code").value;
+
+            // Crear un objeto con los datos del nuevo detalle
+            const newDetail = {
+                detailCode: detailCode,
+                customerGroupCode: customerGroupCode,
+                productReferenceCode: productReferenceCode,
+                opalDetail: opalDetail,
+                combinedDetail: combinedDetail,
+                garmentDetail: garmentDetail,
+                embroideryDetail: embroideryDetail,
+                embroideryLocation: embroideryLocation,
+                colorCode: colorCode,
+                orderCode: orderCode
+            };
+
+            // Enviar la solicitud POST al servidor utilizando Fetch API
+            fetch("/api/detail/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newDetail)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json(); // Devuelve la respuesta en formato JSON
+                })
+                .then(data => {
+                    // Limpiar los campos del formulario después de agregar el nuevo color
+                    addColorForm.reset();
+                    alert("Color added successfully!");
+                })
+                .catch(error => {
+                    console.error("Error adding color:", error);
+                });
+        });
+    });
+</script>
+
+</body>
+
+</html>

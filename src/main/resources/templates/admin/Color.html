@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://wwww.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color</title>
+    <link rel="stylesheet" th:href="@{/css/adminTableStyles.css}" type="text/css" >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="panel">
+            <div class="information">
+                <img th:src="@{/img/logoactiva.png}" alt="Activa"/>
+                <h1>ACTIVA</h1>
+            </div>
+            <hr>
+            <div class="menu">
+                <nav>
+                    <ul>
+                        <li><a th:href="@{/api/admin}" id="buttonadminTable">Home</a></li>
+                        <li><a th:href="@{/api/product}" id="buttonProducts">Products</a></li>
+                        <li><a th:href="@{/api/size}" id="buttonSizes">Sizes</a></li>
+                        <li><a th:href="@{/api/measure}" id="buttonMeasurement">Measurement</a></li>
+                        <li><a th:href="@{/api/lineType}" id="buttonLineType">Line Type</a></li>
+                        <li><a th:href="@{/api/fabric}" id="buttonFabric">Fabric</a></li>
+                        <li><a th:href="@{/api/customer}" id="buttonCustomer">Customer</a></li>
+                        <li><a th:href="@{/api/group}" id="buttonGroup">Group</a></li>
+                        <li><a th:href="@{/api/order}" id="buttonOrders">Orders</a></li>
+                        <li><a th:href="@{/api/customerGroup}" id="buttonCustomer_group">Customer group</a></li>
+                        <li><a th:href="@{/api/detail}" id="buttonDetail">Detail</a></li>
+                        <li><a th:href="@{/api/fabriColor}" id="buttonFabric_color">Fabric color</a></li>
+                        <li><a th:href="@{/api/refProduct}" id="buttonProduct_reference">Product reference</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <button class="btn-action addBtn" onclick="window.location.href='/api/color/addColor'">Add</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Color Code</th>
+                <th>Color Reference</th>
+                <th>Color Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="color : ${colors}">
+                <td><span class="color-code" th:text="${color.colorCode}"></span></td>
+                <td><span class="color-ref" th:text="${color.colorReference}"></span></td>
+                <td><span class="color-desc" th:text="${color.colorDescription}"></span></td>
+                <td>
+                    <button class="btn-action editBtn">Editar</button>
+                    <button class="btn-action deleteBtn">Eliminar</button>
+                    <button class="btn-action saveBtn" style="display:none;">Guardar</button>
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+
+    <script>
+    // Función para editar una fila de color
+    function editColor(colorRow) {
+        const colorCode = colorRow.querySelector('.color-code').textContent;
+        const colorReference = colorRow.querySelector('.color-ref').textContent;
+        const colorDescription = colorRow.querySelector('.color-desc').textContent;
+
+        const editForm = document.createElement('tr');
+        editForm.innerHTML = `
+            <td><input type="text" class="edit-color-code" value="${colorCode}" readonly></td>
+            <td><input type="text" class="edit-color-reference" value="${colorReference}"></td>
+            <td><input type="text" class="edit-color-description" value="${colorDescription}"></td>
+            <td>
+                <button class="btn-action saveBtn">Guardar</button>
+                <button class="btn-action cancelBtn">Cancelar</button>
+            </td>
+        `;
+
+        // Reemplazar la fila de color con el formulario de edición
+        colorRow.replaceWith(editForm);
+
+        // Manejar el evento de guardar cambios
+        editForm.querySelector('.saveBtn').addEventListener('click', () => saveEditedColor(colorCode));
+
+        // Manejar el evento de cancelar edición
+        editForm.querySelector('.cancelBtn').addEventListener('click', cancelEdit);
+    }
+
+    // Función para guardar cambios en el color editado
+    function saveEditedColor(colorCode) {
+        // Obtener los valores editados del formulario
+        const editedColor = {
+            colorReference: document.querySelector('.edit-color-reference').value,
+            colorDescription: document.querySelector('.edit-color-description').value
+        };
+
+        // Enviar los datos editados al servidor para actualizar el color
+        fetch(`/api/color/${colorCode}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(editedColor)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al actualizar el color.");
+            }
+            // Recargar la página después de una actualización exitosa
+            location.reload();
+        })
+        .catch(error => {
+            console.error("Error al actualizar el color:", error);
+        });
+    }
+
+    // Función para cancelar la edición y volver a la fila original de la tabla
+    function cancelEdit() {
+        // Recargar la página sin hacer cambios
+        location.reload();
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const colorTable = document.querySelector("table tbody");
+
+        colorTable.addEventListener("click", function(event) {
+            const target = event.target;
+
+            // Verificar si se hace clic en el botón de editar
+            if (target.classList.contains("editBtn")) {
+                const colorRow = target.closest("tr");
+                editColor(colorRow);
+            }
+
+            // Verificar si se hace clic en el botón de eliminar
+            if (target.classList.contains("deleteBtn")) {
+                const colorRow = target.closest("tr");
+                const colorCode = colorRow.querySelector('.color-code').textContent;
+
+                // Confirmar antes de eliminar
+                if (confirm("¿Estás seguro de que quieres eliminar este color?")) {
+                    // Enviar solicitud DELETE al servidor
+                    fetch(`/api/color/${colorCode}`, {
+                        method: "DELETE"
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Error al eliminar el color.");
+                        }
+                        colorRow.remove(); // Eliminar la fila de la tabla
+                    })
+                    .catch(error => {
+                        console.error("Error al eliminar el color:", error);
+                    });
+                }
+            }
+        });
+    });
+</script>
+</body>
+
+</html>

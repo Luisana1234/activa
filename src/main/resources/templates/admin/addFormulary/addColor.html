@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Add</title>
+    <link rel="stylesheet" th:href="@{/css/buttonsAdd.css}" type="text/css">
+</head>
+
+<body>
+<div class="form">
+    <h2>Add Color Data</h2>
+    <hr>
+    <form th:action="@{/api/color/create}" method="post" id="addColorForm">
+
+        <label for="Color_Reference">Color Reference</label>
+        <input type="text" id="Color_Reference" name="colorReference" th:placeholder="#{type_here}" required>
+
+        <label for="Color_Description">Color Description</label>
+        <input type="text" id="Color_Description" name="colorDescription" th:placeholder="#{type_here}" required>
+
+        <br />
+        <input class="submit" type="submit" value="#{add}" th:action="@{/api/color/create}">
+    </form>
+</div>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/color'">Back</button>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addColorForm = document.getElementById("addColorForm");
+
+        addColorForm.addEventListener("submit", function (event) {
+            event.preventDefault(); // Evita el envío del formulario por defecto
+
+            // Obtener los valores de los campos del formulario
+            const newColorReference = document.getElementById("Color_Reference").value;
+            const newColorDescription = document.getElementById("Color_Description").value;
+
+            // Crear un objeto con los datos del nuevo color
+            const newColor = {
+                colorReference: newColorReference,
+                colorDescription: newColorDescription
+            };
+
+            // Enviar la solicitud POST al servidor utilizando Fetch API
+            fetch("/api/color/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newColor)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json(); // Devuelve la respuesta en formato JSON
+                })
+                .then(data => {
+                    alert("color added successfully!");
+                    // Redirigir a la página principal de medidas
+                    window.location.href = "/api/color";
+                })
+                .catch(error => {
+                    console.error("Error adding color:", error);
+                });
+        });
+    });
+</script>
+
+</body>
+
+</html>
+
+
+
+
+

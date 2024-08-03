@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://wwww.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Measurement</title>
+    <link rel="stylesheet" th:href="@{/css/adminTableStyles.css}" type="text/css" >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+<header>
+    <div class="panel">
+        <div class="information">
+            <img th:src="@{/img/logoactiva.png}" alt="Activa"/>
+            <h1>ACTIVA</h1>
+        </div>
+        <hr>
+        <div class="menu">
+            <nav>
+                <ul>
+                    <li><a th:href="@{/api/admin}" id="buttonadminTable"> Home</a></li>
+                    <li><a th:href="@{/api/product}" id="buttonProducts">Products</a></li>
+                    <li><a th:href="@{/api/size}" id="buttonSizes">Sizes</a></li>
+                    <li><a th:href="@{/api/color}" id="buttonColor">Color</a></li>
+                    <li><a th:href="@{/api/lineType}" id="buttonLineType">Line Type</a></li>
+                    <li><a th:href="@{/api/fabric}" id="buttonFabric">Fabric</a></li>
+                    <li><a th:href="@{/api/customer}" id="buttonCustomer">Customer</a></li>
+                    <li><a th:href="@{/api/group}" id="buttonGroup">Group</a></li>
+                    <li><a th:href="@{/api/order}" id="buttonOrders">Orders</a></li>
+                    <li><a th:href="@{/api/customerGroup}" id="buttonCustomer_group">Customer group</a></li>
+                    <li><a th:href="@{/api/detail}" id="buttonDetail">Detail</a></li>
+                    <li><a th:href="@{/api/fabriColor}" id="buttonFabric_color">Fabric color</a></li>
+                    <li><a th:href="@{/api/refProduct}" id="buttonProduct_reference">Product reference</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/measure/addMeasurement'">add</button>
+<!-- Aquí empieza la tabla donde se mostrarán los datos -->
+<table>
+    <thead>
+    <tr>
+        <th>Measurement Code</th>
+        <th>Measurement Size</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="measure : ${measures}">
+        <td><span class="measure-id" th:text="${measure.id}"></span></td>
+        <td><span class="measure-size" th:text="${measure.measureSize}"></span></td>
+        <td>
+            <button class="btn-action editBtn">Editar</button>
+            <button class="btn-action deleteBtn">Eliminar</button>
+            <button class="btn-action saveBtn" style="display:none;">Guardar</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<!-- Aquí termina la tabla -->
+
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const measureTable = document.querySelector("table tbody");
+
+            measureTable.addEventListener("click", function (event) {
+                const target = event.target;
+
+                // Check if edit button was clicked
+                if (target.classList.contains("editBtn")) {
+                    const measureRow = target.closest("tr");
+
+                    // Hide edit buttons and show save button
+                    measureRow.querySelector(".editBtn").style.display = "none";
+                    measureRow.querySelector(".deleteBtn").style.display = "none";
+                    measureRow.querySelector(".saveBtn").style.display = "";
+
+                    // Enable field editing
+                    measureRow.querySelectorAll("td").forEach(td => {
+                        const span = td.querySelector("span");
+                        if (span) {
+                            const input = document.createElement("input");
+                            input.value = span.textContent;
+                            td.appendChild(input);
+                            span.style.display = "none";
+                        }
+                    });
+                }
+
+                // Check if save button was clicked
+                if (target.classList.contains("saveBtn")) {
+                    const measureRow = target.closest("tr");
+                    const measureId = measureRow.querySelector(".measure-id").textContent;
+
+                    // Check if all fields are filled
+                    const inputs = measureRow.querySelectorAll("input");
+                    for (const input of inputs) {
+                        if (!input.value.trim()) {
+                            alert("Please fill in all fields before saving.");
+                            return; // Stop saving process if any field is empty
+                        }
+                    }
+
+                    // Get edited values from the form
+                    const editedMeasure = {
+                        measureSize: inputs[1].value // Ensure to get the correct input field
+                    };
+
+                    // Send edited data to server to update the measure
+                    fetch(`/api/measure/${measureId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(editedMeasure)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Failed to update the measure.");
+                        }
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error("Error updating the measure:", error);
+                    });
+                }
+
+                // Check if delete button was clicked
+                if (target.classList.contains("deleteBtn")) {
+                    const measureRow = target.closest("tr");
+                    const measureId = measureRow.querySelector(".measure-id").textContent;
+
+                    // Confirm before deleting
+                    if (confirm("Are you sure you want to delete this measure?")) {
+                        // Send DELETE request to server
+                        fetch(`/api/measure/${measureId}`, {
+                            method: "DELETE"
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Error deleting the measure.");
+                            }
+                            measureRow.remove();
+                        })
+                        .catch(error => {
+                            console.error("Error deleting the measure:", error);
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

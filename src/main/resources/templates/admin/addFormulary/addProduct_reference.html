@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Reference Add</title>
+    <link rel="stylesheet" th:href="@{/css/buttonsAdd.css}" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+<div class="form">
+    <h2>Add Product Reference Data</h2>
+    <hr>
+    <form th:action="@{/api/refProduct/create}" method="post" id="addProductReferenceForm">
+        <label for="Product_Ref_Code">Product Ref Code</label>
+        <input type="text" id="Product_Ref_Code" name="productRefCode"  th:placeholder="#{Type here}" required>
+
+        <label for="Description">Description</label>
+        <input type="text" id="Description" name="description"  th:placeholder="#{Type here}" required>
+
+        <label for="Photo">Photo</label>
+        <input type="text" id="Photo" name="Photo"  th:placeholder="#{Type here}" required>
+
+        <label for="Product_Code">Product Code</label>
+        <input type="text" id="Product_Code" name="productModel"  th:placeholder="#{Type here}" required>
+
+        <label for="Line_Code">Line Code</label>
+        <input type="text" id="Line_Code" name="lineTypeModel" th:placeholder="#{Type here}" required>
+
+        <label for="Size_Code">Size Code</label>
+        <input type="text" id="Size_Code" name="sizeModel"  th:placeholder="#{Type here}" required>
+
+        <label for="Measure_Code">Measure Code</label>
+        <input type="text" id="Measure_Code" name="measureModel" th:placeholder="#{Type here}" required>
+
+        <br />
+        <input class="submit" type="submit" value="#{add}" th:action="@{api/refProduct/create}">
+    </form>
+</div>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/refProduct'">Back to Product Reference</button>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addProductReferenceForm = document.getElementById("addProductReferenceForm");
+
+        addProductReferenceForm.addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Get values from form fields
+            const newProductRefCode = document.getElementById("Product_Ref_Code").value;
+            const newDescription = document.getElementById("Description").value;
+            const newPhoto = document.getElementById("Photo").value;
+            const newProductModel = document.getElementById("Product_Code").value;
+            const newLineTypeModel = document.getElementById("Line_Code").value;
+            const newSizeModel = document.getElementById("Size_Code").value;
+            const newMeasureModel = document.getElementById("Measure_Code").value;
+
+            // Create an object with the new product reference data
+            const newProductReference = {
+                productRefCode: newProductRefCode,
+                description: newDescription,
+                Photo: newPhoto,
+                productModel: newProductModel,
+                lineModel: newLineTypeModel,
+                sizeModel: newSizeModel,
+                measureModel: newMeasureModel
+            };
+
+            // Send POST request to server using Fetch API
+            fetch("/api/refProduct/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newProductReference)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json(); // Return response in JSON format
+                })
+                .then(data => {
+                    alert("Product reference added succesfully!");
+                     window.location.href = "/api/refProduct"
+                                    })
+                .catch(error => {
+                    console.error("Error adding product reference:", error);
+                });
+        });
+    });
+</script>
+</body>
+</html>

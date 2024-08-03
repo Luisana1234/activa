@@ -1,0 +1,97 @@
+<html>   
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+ <head>     
+<style>
+
+body {
+font-family: system-ui;
+background:
+text-align: left;
+line-height: 2;
+}
+
+table {
+border-collapse: collapse;
+}
+  
+td,
+th {
+td height: 35px;
+td width: 600px;
+overflow: hidden;
+vertical-align: middle;
+border: 1px solid rgb(0,0,0);
+padding-left: 10px;
+padding-right: 10px;
+text-align: left; 
+}
+  
+th{
+vertical-align: middle;
+background-color: black;
+color: white
+}
+
+.Titulo {
+font-size: 4vw;
+}
+
+.Centrador }
+text-align: left
+}
+
+</style>
+  
+<body>
+<h1 class = "Titulo">ORDEN DE PEDIDO</h1>
+<br>
+<br>
+<p><strong>Cliente:</strong> &lt;&lt;[Nombre Cliente]&gt;&gt;</p>
+<p><strong>Ubicación:</strong> &lt;&lt;[Ubicacion]&gt;&gt;</p>
+<p><strong>Fecha:</strong> &lt;&lt;[Fecha]&gt;&gt;</p>
+<p><strong>ID Pedido:</strong> &lt;&lt;[ID pedido]&gt;&gt;</p>
+<br>
+<br>       
+<table>
+<thead>
+<tr>
+<th style="font-weight: bold;column-width: 15px;">&#x2713;</th>
+<th style="font-weight: bold;column-width: 15px;">&#x2713;</th>
+<th style="border: 0px;background-color: #FFFFFF;column-width: 10px;"></th>
+<th style="font-weight: bold;">DETALLE</th>
+<th style="text-align: center;font-weight: bold;">CANT. (por ½ doc.)</th>
+<th style="text-align: center;font-weight: bold;">PRECIO</th>
+</tr>
+</thead>
+<tr>
+<td style="column-width: 15px;"></td>
+<td style="column-width: 15px;"></td>
+<td style="border: 0px;background-color: #FFFFFF;column-width: 10px;"></td>
+<td>&lt;&lt;Start: [Related 4. Detalle Ventas]&gt;&gt;&lt;&lt;[Codigo producto]&gt;&gt;</td>
+<td style="text-align: center">&lt;&lt;[Cantidad (por ½ Doc.)]&gt;&gt;</td>
+<td style="text-align: center">&lt;&lt;[Total]&gt;&gt;&lt;&lt;End&gt;&gt;</td>
+</tr>    
+<tfoot>
+<tr>
+<td style="border: 0px;background-color: #FFFFFF;column-width: 15px;"></td>
+<td style="border: 0px;background-color: #FFFFFF;column-width: 15px;"></td>
+<td style="border: 0px;background-color: #FFFFFF;column-width: 10px;"></td>
+<td style="font-weight: bold;">TOTAL</td>
+<td style="text-align: center;font-weight: bold;">&lt;&lt;[Total Cantidades]&gt;&gt;</td>
+<td style="text-align: center;font-weight: bold;">&lt;&lt;[Total pedido]&gt;&gt;</td>
+</tr>
+</tfoot>
+</table>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<p Style= "padding-left: 85px;"><strong>FIRMA: ____________________________________________</strong></p>
+
+</body>
+</head>
+  
+</html>

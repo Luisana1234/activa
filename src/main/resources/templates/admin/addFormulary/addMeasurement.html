@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Measurement Add</title>
+    <link rel="stylesheet" th:href="@{/css/buttonsAdd.css}" type="text/css">
+</head>
+
+<body>
+<div class="form">
+    <h2>Add Measurement Data</h2>
+    <hr>
+    <form id="addMeasurementForm">
+        <label for="Measurement_Size">Measurement Size</label>
+        <input type="text" id="Measurement_Size" name="measureSize" th:placeholder="#{type_here}" required>
+        <br />
+        <input class="submit" type="submit" value="Add">
+    </form>
+</div>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/measure'">Back</button>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addMeasurementForm = document.getElementById("addMeasurementForm");
+
+        addMeasurementForm.addEventListener("submit", function (event) {
+            event.preventDefault(); // Evita el envío del formulario por defecto
+
+            // Obtener los valores de los campos del formulario
+            const newMeasurementSize = document.getElementById("Measurement_Size").value;
+
+            // Crear un objeto con los datos de la nueva medición
+            const newMeasurement = {
+                measureSize: newMeasurementSize
+            };
+
+            // Enviar la solicitud POST al servidor utilizando Fetch API
+            fetch("/api/measure/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newMeasurement)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json(); // Devuelve la respuesta en formato JSON
+                })
+                .then(data => {
+                    alert("Measurement added successfully!");
+                    // Redirigir a la página principal de medidas
+                    window.location.href = "/api/measure";
+                })
+                .catch(error => {
+                    console.error("Error adding measurement:", error);
+                });
+        });
+    });
+</script>
+
+</body>
+
+</html>

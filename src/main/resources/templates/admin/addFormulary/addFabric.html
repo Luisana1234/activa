@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabric Add</title>
+    <link rel="stylesheet" th:href="@{/css/buttonsAdd.css}" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+<div class="form">
+    <h2>Add Fabric Data</h2>
+    <hr>
+    <form id="addFabricForm">
+        <label for="Fabric_Type">Fabric Type</label>
+        <input type="text" id="Fabric_Type" name="fabricType" placeholder="Type here" required>
+
+        <label for="Fabric_Composition">Fabric Composition</label>
+        <input type="text" id="Fabric_Composition" name="fabricComposition" placeholder="Type here" required>
+
+        <label for="Fabric_Notes">Fabric Notes</label>
+        <input type="text" id="Fabric_Notes" name="fabricNotes" placeholder="Type here" required>
+
+        <br />
+        <input class="submit" type="submit" value="Add">
+    </form>
+</div>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/fabric'">Back</button>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addFabricForm = document.getElementById("addFabricForm");
+
+        addFabricForm.addEventListener("submit", function (event) {
+            event.preventDefault(); // Evita el envío del formulario por defecto
+
+            const newFabricType = document.getElementById("Fabric_Type").value;
+            const newFabricComposition = document.getElementById("Fabric_Composition").value;
+            const newFabricNotes = document.getElementById("Fabric_Notes").value;
+
+            const newFabric = {
+                fabricType: newFabricType,
+                fabricComposition: newFabricComposition,
+                fabricNotes: newFabricNotes
+            };
+
+            fetch("/api/fabric/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newFabric)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert("Fabric added successfully!");
+                    window.location.href = "/api/fabric";
+                })
+                .catch(error => {
+                    console.error("Error adding fabric:", error);
+                });
+        });
+    });
+</script>
+</body>
+
+</html>

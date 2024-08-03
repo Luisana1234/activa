@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line Type</title>
+    <link rel="stylesheet" th:href="@{/css/adminTableStyles.css}" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+<header>
+    <div class="panel">
+        <div class="information">
+            <img th:src="@{/img/logoactiva.png}" alt="Activa" />
+            <h1>ACTIVA</h1>
+        </div>
+        <hr>
+        <div class="menu">
+            <nav>
+                <ul>
+                    <li><a th:href="@{/api/admin}" id="buttonadminTable"> Home</a></li>
+                    <li><a th:href="@{/api/product}" id="buttonProducts">Products</a></li>
+                    <li><a th:href="@{/api/size}" id="buttonSizes">Sizes</a></li>
+                    <li><a th:href="@{/api/measure}" id="buttonMeasurement">Measurement</a></li>
+                    <li><a th:href="@{/api/color}" id="buttonColor">Color</a></li>
+                    <li><a th:href="@{/api/fabric}" id="buttonFabric">Fabric</a></li>
+                    <li><a th:href="@{/api/customer}" id="buttonCustomer">Customer</a></li>
+                    <li><a th:href="@{/api/group}" id="buttonGroup">Group</a></li>
+                    <li><a th:href="@{/api/order}" id="buttonOrders">Orders</a></li>
+                    <li><a th:href="@{/api/customerGroup}" id="buttonCustomer_group">Customer group</a></li>
+                    <li><a th:href="@{/api/detail}" id="buttonDetail">Detail</a></li>
+                    <li><a th:href="@{/api/fabriColor}" id="buttonFabric_color">Fabric color</a></li>
+                    <li><a th:href="@{/api/refProduct}" id="buttonProduct_reference">Product reference</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+<button class="btn-action addBtn" onclick="window.location.href='/api/lineType/addLineType'">Add</button>
+
+<!-- Aquí empieza la tabla donde se mostrarán los datos -->
+<table>
+    <thead>
+    <tr>
+        <th>Line Code</th>
+        <th>Line Name</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="lineType : ${lineTypes}">
+        <td><span class="lineType-id" th:text="${lineType.id}" th:data-id="${lineType.id}"></span></td>
+        <td><span class="lineType-name" th:text="${lineType.name}"></span></td>
+        <td>
+            <button class="btn-action editBtn">Edit</button>
+            <button class="btn-action deleteBtn">Delete</button>
+            <button class="btn-action saveBtn" style="display:none;">Save</button>
+            <button class="btn-action cancelBtn" style="display:none;">Cancel</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<!-- Aquí termina la tabla -->
+
+<script>
+        // Replace the table row with the edit form
+        function editLineType(lineTypeRow) {
+            // Hide edit buttons and show save and cancel buttons
+            lineTypeRow.querySelector(".editBtn").style.display = "none";
+            lineTypeRow.querySelector(".deleteBtn").style.display = "none";
+            lineTypeRow.querySelector(".saveBtn").style.display = "";
+            lineTypeRow.querySelector(".cancelBtn").style.display = "";
+
+            // Enable field editing
+            lineTypeRow.querySelectorAll("td").forEach(td => {
+                const span = td.querySelector("span");
+                if (span) {
+                    const input = document.createElement("input");
+                    input.value = span.textContent;
+                    td.appendChild(input);
+                    span.style.display = "none";
+                }
+            });
+        }
+
+        // Function to save changes to the edited line type
+        function saveEditedLineType(lineTypeId) {
+            const lineTypeRow = document.querySelector(`.lineType-id[data-id="${lineTypeId}"]`).closest("tr");
+
+            // Check if all fields are filled
+            const inputs = lineTypeRow.querySelectorAll("input");
+            for (const input of inputs) {
+                if (!input.value.trim()) {
+                    alert("Please fill in all fields before saving.");
+                    return; // Stop saving process if any field is empty
+                }
+            }
+
+            // Get edited form values
+            const editedLineType = {
+                name: inputs[1].value // assuming second column is name
+            };
+
+            // Send edited data to server to update line type
+            fetch(`/api/lineType/${lineTypeId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(editedLineType)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error updating line type.");
+                }
+                // Reload line type list after successful update
+                location.reload();
+            })
+            .catch(error => {
+                console.error("Error updating line type:", error);
+            });
+        }
+
+        // Function to cancel editing and show the original table row
+        function cancelEdit(lineTypeRow) {
+            // Hide save and cancel buttons and show edit button
+            lineTypeRow.querySelector(".editBtn").style.display = "";
+            lineTypeRow.querySelector(".deleteBtn").style.display = "";
+            lineTypeRow.querySelector(".saveBtn").style.display = "none";
+            lineTypeRow.querySelector(".cancelBtn").style.display = "none";
+
+            // Restore original field values
+            lineTypeRow.querySelectorAll("td").forEach(td => {
+                const input = td.querySelector("input");
+                const span = td.querySelector("span");
+                if (input) input.remove();
+                if (span) span.style.display = "";
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const lineTypeTable = document.querySelector("table tbody");
+
+            lineTypeTable.addEventListener("click", function(event) {
+                const target = event.target;
+
+                // Check if edit button is clicked
+                if (target.classList.contains("editBtn")) {
+                    const lineTypeRow = target.closest("tr");
+                    editLineType(lineTypeRow);
+                }
+
+                // Check if save button is clicked
+                if (target.classList.contains("saveBtn")) {
+                    const lineTypeRow = target.closest("tr");
+                    const lineTypeId = lineTypeRow.querySelector(".lineType-id").getAttribute("data-id");
+                    saveEditedLineType(lineTypeId);
+                }
+
+                // Check if cancel button is clicked
+                if (target.classList.contains("cancelBtn")) {
+                    const lineTypeRow = target.closest("tr");
+                    cancelEdit(lineTypeRow);
+                }
+
+                // Check if delete button is clicked
+                if (target.classList.contains("deleteBtn")) {
+                    const lineTypeRow = target.closest("tr");
+                    const lineTypeId = lineTypeRow.querySelector(".lineType-id").getAttribute("data-id");
+
+                    // Confirm before deleting
+                    if (confirm("Are you sure you want to delete this line type?")) {
+                        // Send DELETE request to server
+                        fetch(`/api/lineType/${lineTypeId}`, {
+                            method: "DELETE"
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Error deleting line type.");
+                            }
+                            lineTypeRow.remove();
+                        })
+                        .catch(error => {
+                            console.error("Error deleting line type:", error);
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

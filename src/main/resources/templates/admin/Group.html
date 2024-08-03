@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group</title>
+    <link rel="stylesheet" th:href="@{/css/adminTableStyles.css}" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+<header>
+    <div class="panel">
+        <div class="information">
+            <img th:src="@{/img/logoactiva.png}" alt="Activa"/>
+            <h1>ACTIVA</h1>
+        </div>
+        <hr>
+        <div class="menu">
+            <nav>
+                <ul>
+                    <li><a th:href="@{/api/admin}" id="buttonadminTable">Home</a></li>
+                    <li><a th:href="@{/api/product}" id="buttonProducts">Products</a></li>
+                    <li><a th:href="@{/api/size}" id="buttonSizes">Sizes</a></li>
+                    <li><a th:href="@{/api/measure}" id="buttonMeasurement">Measurement</a></li>
+                    <li><a th:href="@{/api/lineType}" id="buttonLineType">Line Type</a></li>
+                    <li><a th:href="@{/api/fabric}" id="buttonFabric">Fabric</a></li>
+                    <li><a th:href="@{/api/customer}" id="buttonCustomer">Customer</a></li>
+                    <li><a th:href="@{/api/color}" id="buttonColor">Color</a></li>
+                    <li><a th:href="@{/api/order}" id="buttonOrders">Orders</a></li>
+                    <li><a th:href="@{/api/customerGroup}" id="buttonCustomer_group">Customer group</a></li>
+                    <li><a th:href="@{/api/detail}" id="buttonDetail">Detail</a></li>
+                    <li><a th:href="@{/api/fabriColor}" id="buttonFabric_color">Fabric color</a></li>
+                    <li><a th:href="@{/api/refProduct}" id="buttonProduct_reference">Product reference</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/group/addGroup'">Add</button>
+
+<table>
+    <thead>
+    <tr>
+        <th>Group Code</th>
+        <th>Group NIT</th>
+        <th>Group Name</th>
+        <th>Group Address</th>
+        <th>Group Phone</th>
+        <th>Group Email</th>
+        <th>Group Contact</th>
+        <th>Group Type</th>
+        <th>Group Position</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="group : ${groups}">
+        <td><span class="groupId" th:text="${group.id}"></span></td>
+        <td><span class="groupNIT" th:text="${group.groupNit}"></span></td>
+        <td><span class="groupName" th:text="${group.groupName}"></span></td>
+        <td><span class="groupAddress" th:text="${group.groupAddress}"></span></td>
+        <td><span class="groupPhone" th:text="${group.groupPhone}"></span></td>
+        <td><span class="groupEmail" th:text="${group.groupEmail}"></span></td>
+        <td><span class="groupContact" th:text="${group.groupContact}"></span></td>
+        <td><span class="groupType" th:text="${group.groupType}"></span></td>
+        <td><span class="groupPosition" th:text="${group.groupPosition}"></span></td>
+        <td>
+            <button class="btn-action editBtn">Edit</button>
+            <button class="btn-action deleteBtn">Delete</button>
+            <button class="btn-action saveBtn" style="display:none;">Save</button>
+            <button class="btn-action cancelBtn" style="display:none;">Cancel</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+   document.addEventListener("DOMContentLoaded", function () {
+       const groupTable = document.querySelector("table tbody");
+
+       groupTable.addEventListener("click", function (event) {
+           const target = event.target;
+
+           if (target.classList.contains("editBtn")) {
+               const groupRow = target.closest("tr");
+
+               groupRow.querySelector(".editBtn").style.display = "none";
+               groupRow.querySelector(".deleteBtn").style.display = "none";
+               groupRow.querySelector(".saveBtn").style.display = "";
+               groupRow.querySelector(".cancelBtn").style.display = "";
+
+               groupRow.querySelectorAll("td").forEach(td => {
+                   const span = td.querySelector("span");
+                   if (span) {
+                       const input = document.createElement("input");
+                       input.value = span.textContent;
+                       td.appendChild(input);
+                       span.style.display = "none";
+                   }
+               });
+           }
+
+           if (target.classList.contains("saveBtn")) {
+               const groupRow = target.closest("tr");
+               const groupId = groupRow.querySelector(".groupId").textContent;
+
+               const inputs = groupRow.querySelectorAll("input");
+               for (const input of inputs) {
+                   if (!input.value.trim()) {
+                       alert("Please fill in all fields before saving.");
+                       return;
+                   }
+               }
+
+               const editedGroup = {
+                   groupNit: inputs[1].value,
+                   groupName: inputs[2].value,
+                   groupAddress: inputs[3].value,
+                   groupPhone: inputs[4].value,
+                   groupEmail: inputs[5].value,
+                   groupContact: inputs[6].value,
+                   groupType: inputs[7].value,
+                   groupPosition: inputs[8].value
+               };
+
+               fetch(`/api/group/${groupId}`, {
+                   method: "PUT",
+                   headers: {
+                       "Content-Type": "application/json"
+                   },
+                   body: JSON.stringify(editedGroup)
+               })
+               .then(response => {
+                   if (!response.ok) {
+                       throw new Error("Failed to update the group.");
+                   }
+                   location.reload();
+               })
+               .catch(error => {
+                   console.error("Error updating the group:", error);
+               });
+           }
+
+           if (target.classList.contains("deleteBtn")) {
+               const groupRow = target.closest("tr");
+               const groupId = groupRow.querySelector(".groupId").textContent;
+
+               if (confirm("Are you sure you want to delete this group?")) {
+                   fetch(`/api/group/${groupId}`, {
+                       method: "DELETE"
+                   })
+                   .then(response => {
+                       if (!response.ok) {
+                           throw new Error("Error deleting the group.");
+                       }
+                       groupRow.remove();
+                   })
+                   .catch(error => {
+                       console.error("Error deleting the group:", error);
+                   });
+               }
+           }
+       });
+   });
+</script>
+</body>
+</html>
+
+

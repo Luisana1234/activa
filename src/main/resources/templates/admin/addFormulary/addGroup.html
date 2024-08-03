@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Add</title>
+    <link rel="stylesheet" th:href="@{/css/buttonsAdd.css}" type="text/css">
+</head>
+
+<body>
+<div class="form">
+    <h2>Add Group Data</h2>
+    <hr>
+    <form th:action="@{/api/group/create}" method="post" id="addGroupForm">
+
+        <label for="groupNIT">Group NIT</label>
+        <input type="text" id="groupNIT" name="groupNIT" placeholder="Type here" required>
+
+        <label for="groupName">Group Name</label>
+        <input type="text" id="groupName" name="groupName" placeholder="Type here" required>
+
+        <label for="groupAddress">Group Address</label>
+        <input type="text" id="groupAddress" name="groupAddress" placeholder="Type here" required>
+
+        <label for="groupPhone">Group Phone</label>
+        <input type="text" id="groupPhone" name="groupPhone" placeholder="Type here" required>
+
+        <label for="groupEmail">Group Email</label>
+        <input type="email" id="groupEmail" name="groupEmail" placeholder="Type here" required>
+
+        <label for="groupContact">Group Contact</label>
+        <input type="text" id="groupContact" name="groupContact" placeholder="Type here" required>
+
+        <label for="groupType">Group Type</label>
+        <input type="text" id="groupType" name="groupType" placeholder="Type here" required>
+
+        <label for="groupPosition">Group Position</label>
+        <input type="text" id="groupPosition" name="groupPosition" placeholder="Type here" required>
+
+        <br />
+        <input class="submit" type="submit" value="Add">
+    </form>
+</div>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/group'">Back</button>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+   const addGroupForm = document.getElementById("addGroupForm");
+
+   addGroupForm.addEventListener("submit", function (event) {
+       event.preventDefault(); // Evita el envío del formulario por defecto
+
+       // Obtener los valores de los campos del formulario
+       const groupNIT = document.getElementById("groupNIT").value;
+       const groupName = document.getElementById("groupName").value;
+       const groupAddress = document.getElementById("groupAddress").value;
+       const groupPhone = document.getElementById("groupPhone").value;
+       const groupEmail = document.getElementById("groupEmail").value;
+       const groupContact = document.getElementById("groupContact").value;
+       const groupType = document.getElementById("groupType").value;
+       const groupPosition = document.getElementById("groupPosition").value;
+
+       // Crear un objeto con los datos del nuevo grupo
+       const newGroup = {
+           groupNIT: groupNIT,
+           groupName: groupName,
+           groupAddress: groupAddress,
+           groupPhone: groupPhone,
+           groupEmail: groupEmail,
+           groupContact: groupContact,
+           groupType: groupType,
+           groupPosition: groupPosition
+       };
+
+       // Enviar la solicitud POST al servidor utilizando Fetch API
+       fetch("/api/group/create", {
+           method: "POST",
+           headers: {
+               "Content-Type": "application/json"
+           },
+           body: JSON.stringify(newGroup)
+       })
+       .then(response => {
+           if (!response.ok) {
+               throw new Error("Network response was not ok");
+           }
+           return response.json(); // Devuelve la respuesta en formato JSON
+       })
+       .then(data => {
+           alert("Group added successfully!");
+           window.location.href = "/api/group"; // Redirigir a la página de lista de grupos
+       })
+       .catch(error => {
+           console.error("Error adding group:", error);
+       });
+   });
+});
+</script>
+
+</body>
+</html>

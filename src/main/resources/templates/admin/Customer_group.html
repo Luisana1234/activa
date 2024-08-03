@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Group</title>
+    <link rel="stylesheet" th:href="@{/css/adminTableStyles.css}" type="text/css" >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+<header>
+    <div class="panel">
+        <div class="information">
+            <img th:src="@{/img/logoactiva.png}" alt="Activa"/>
+            <h1>ACTIVA</h1>
+        </div>
+        <hr>
+        <div class="menu">
+            <nav>
+                <ul>
+                    <li><a th:href="@{/api/admin}" id="buttonadminTable"> Home</a></li>
+                    <li><a th:href="@{/api/product}" id="buttonProducts">Products</a></li>
+                    <li><a th:href="@{/api/size}" id="buttonSizes">Sizes</a></li>
+                    <li><a th:href="@{/api/measure}" id="buttonMeasurement">Measurement</a></li>
+                    <li><a th:href="@{/api/lineType}" id="buttonLineType">Line Type</a></li>
+                    <li><a th:href="@{/api/fabric}" id="buttonFabric">Fabric</a></li>
+                    <li><a th:href="@{/api/customer}" id="buttonCustomer">Customer</a></li>
+                    <li><a th:href="@{/api/group}" id="buttonGroup">Group</a></li>
+                    <li><a th:href="@{/api/order}" id="buttonOrders">Orders</a></li>
+                    <li><a th:href="@{/api/color}" id="buttonColor">Color</a></li>
+                    <li><a th:href="@{/api/detail}" id="buttonDetail">Detail</a></li>
+                    <li><a th:href="@{/api/fabriColor}" id="buttonFabric_color">Fabric color</a></li>
+                    <li><a th:href="@{/api/refProduct}" id="buttonProduct_reference">Product reference</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/customerGroup/addCustomergroup'">Add</button>
+
+<table>
+    <thead>
+    <tr>
+        <th>Client Code</th>
+        <th>Name</th>
+        <th>ID</th>
+        <th>Address</th>
+        <th>Contact</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="customerGroup : ${customerGroups}">
+        <td><span class="customer-id" th:text="${customerGroup.id}"></span></td>
+        <td><span class="customer-name" th:text="${customerGroup.customer}"></span></td>
+        <td><span class="customer-group" th:text="${customerGroup.group}"></span></td>
+        <td><span class="customer-address" th:text="${customerGroup.address}"></span></td>
+        <td><span class="customer-contact" th:text="${customerGroup.contact}"></span></td>
+        <td>
+            <button class="btn-action editBtn">Edit</button>
+            <button class="btn-action deleteBtn">Delete</button>
+            <button class="btn-action saveBtn" style="display:none;">Save</button>
+            <button class="btn-action cancelBtn" style="display:none;">Cancel</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const customerGroupTable = document.querySelector("table tbody");
+
+        customerGroupTable.addEventListener("click", function (event) {
+            const target = event.target;
+
+            // Check if edit button was clicked
+            if (target.classList.contains("editBtn")) {
+                const customerGroupRow = target.closest("tr");
+
+                // Hide edit buttons and show save button
+                customerGroupRow.querySelector(".editBtn").style.display = "none";
+                customerGroupRow.querySelector(".deleteBtn").style.display = "none";
+                customerGroupRow.querySelector(".saveBtn").style.display = "";
+
+                // Enable field editing
+                customerGroupRow.querySelectorAll("td").forEach(td => {
+                    const span = td.querySelector("span");
+                    if (span) {
+                        const input = document.createElement("input");
+                        input.value = span.textContent;
+                        td.appendChild(input);
+                        span.style.display = "none";
+                    }
+                });
+            }
+
+            // Check if save button was clicked
+            if (target.classList.contains("saveBtn")) {
+                const customerGroupRow = target.closest("tr");
+                const customerGroupId = customerGroupRow.querySelector(".customer-id").textContent;
+
+                // Check if all fields are filled
+                const inputs = customerGroupRow.querySelectorAll("input");
+                for (const input of inputs) {
+                    if (!input.value.trim()) {
+                        alert("Please fill in all fields before saving.");
+                        return; // Stop saving process if any field is empty
+                    }
+                }
+
+                // Get edited values from the form
+                const editedCustomerGroup = {
+                    customer: inputs[1].value,
+                    group: inputs[2].value,
+                    address: inputs[3].value,
+                    contact: inputs[4].value
+                };
+
+                // Send edited data to server to update the customer group
+                fetch(`/api/customergroup/${customerGroupId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(editedCustomerGroup)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Failed to update the customer group.");
+                        }
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error("Error updating the customer group:", error);
+                    });
+            }
+
+            // Check if delete button was clicked
+            if (target.classList.contains("deleteBtn")) {
+                const customerGroupRow = target.closest("tr");
+                const customerGroupId = customerGroupRow.querySelector(".customer-id").textContent;
+
+                // Confirm before deleting
+                if (confirm("Are you sure you want to delete this customer group?")) {
+                    // Send DELETE request to server
+                    fetch(`/api/customergroup/${customerGroupId}`, {
+                        method: "DELETE"
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Error deleting the customer group.");
+                            }
+                            customerGroupRow.remove();
+                        })
+                        .catch(error => {
+                            console.error("Error deleting the customer group:", error);
+                        });
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
+
+

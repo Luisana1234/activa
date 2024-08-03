@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabric Color Add</title>
+    <link rel="stylesheet" th:href="@{/css/buttonsAdd.css}" type="text/css">
+</head>
+
+<body>
+<div class="form">
+    <h2>Add Fabric Color Data</h2>
+    <hr>
+    <form id="addFabricColorForm">
+        <label for="Fabric">Fabric</label>
+        <select id="Fabric" name="fabricId" required>
+            <option value="" selected>Select Fabric</option>
+            <th:block th:each="fabric : ${fabrics}">
+                <option th:value="${fabric.id}" th:text="${fabric.fabricType}"></option>
+            </th:block>
+        </select>
+
+        <label for="Color">Color</label>
+        <select id="Color" name="colorId" required>
+            <option value="" selected>Select Color</option>
+            <th:block th:each="color : ${colors}">
+                <option th:value="${color.id}" th:text="${color.colorReference}"></option>
+            </th:block>
+        </select>
+
+        <label for="Garment_Descriptions">Garment Descriptions</label>
+        <input type="text" id="Garment_Descriptions" name="garmentDescription" th:placeholder="Type here" required>
+
+        <label for="Garment_Notes">Garment Notes</label>
+        <input type="text" id="Garment_Notes" name="garmentNotes" th:placeholder="Type here" required>
+
+        <br />
+        <input class="submit" type="submit" value="Add">
+    </form>
+</div>
+
+<button class="btn-action addBtn" onclick="window.location.href='/api/fabriColor'">Back</button>
+
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const addFabricColorForm = document.getElementById("addFabricColorForm");
+
+            addFabricColorForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const fabricId = document.getElementById("Fabric").value;
+                const colorId = document.getElementById("Color").value;
+                const garmentDescription = document.getElementById("Garment_Descriptions").value;
+                const garmentNotes = document.getElementById("Garment_Notes").value;
+
+                const newFabricColor = {
+                    fabricId: fabricId,
+                    colorId: colorId,
+                    garmentDescription: garmentDescription,
+                    garmentNotes: garmentNotes
+                };
+
+                fetch("/api/fabriColor/create", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(newFabricColor)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to create fabric color.");
+                    }
+                    window.location.href = "/api/fabriColor";
+                })
+                .catch(error => {
+                    console.error("Error creating fabric color:", error);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

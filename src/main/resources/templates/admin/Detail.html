@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://wwww.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail</title>
+    <link rel="stylesheet" th:href="@{/css/adminTableStyles.css}"  >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="panel">
+            <div class="information">
+                <img th:src="@{/img/logoactiva.png}" alt="Activa"/>
+                <h1>ACTIVA</h1>
+            </div>
+            <hr>
+            <div class="menu">
+                <nav>
+                    <ul>
+                        <li><a th:href="@{/api/admin}" id="buttonadminTable"> Home</a></li>
+                        <li><a th:href="@{/api/product}" id="buttonProducts">Products</a></li>
+                        <li><a th:href="@{/api/size}" id="buttonSizes">Sizes</a></li>
+                        <li><a th:href="@{/api/measure}" id="buttonMeasurement">Measurement</a></li>
+                        <li><a th:href="@{/api/lineType}" id="buttonLineType">Line Type</a></li>
+                        <li><a th:href="@{/api/fabric}" id="buttonFabric">Fabric</a></li>
+                        <li><a th:href="@{/api/customer}" id="buttonCustomer">Customer</a></li>
+                        <li><a th:href="@{/api/group}" id="buttonGroup">Group</a></li>
+                        <li><a th:href="@{/api/order}" id="buttonOrders">Orders</a></li>
+                        <li><a th:href="@{/api/customerGroup}" id="buttonCustomer_group">Customer group</a></li>
+                        <li><a th:href="@{/api/color}" id="buttonColor">Color</a></li>
+                        <li><a th:href="@{/api/fabriColor}" id="buttonFabric_color">Fabric color</a></li>
+                        <li><a th:href="@{/api/refProduct}" id="buttonProduct_reference">Product reference</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+
+    <button class="btn-action addBtn" onclick="window.location.href='/api/detail/addDetail'">add</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Detail Code</th>
+                <th>Costumer Group Code</th>
+                <th>Product Reference Code</th>
+                <th>Opal Detail</th>
+                <th>Combined Detail</th>
+                <th>Garment Detail</th>
+                <th>Embroidery Detail</th>
+                <th>Embroidery Location</th>
+                <th>Color Code</th>
+                <th>Order Code</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr th:each="detail : ${details}">
+            <td><span class="detail-id" th:text="${detail.id}"></span></td>
+            <td><span class="detail-opal" th:text="${detail.opalDetail}"></span></td>
+            <td><span class="detail-comb" th:text="${detail.combinedDetail}"></span></td>
+            <td><span class="detail-garmt" th:text="${detail.garmentDetail}"></span></td>
+            <td><span class="detail-embr" th:text="${detail.embroideryDetail}"></span></td>
+            <td><span class="detail-embrLoc" th:text="${detail.embroideryLocation}"></span></td>
+            <td><span class="detail-cus" th:text="${detail.Customer_group_code_id}"></span></td>
+            <td><span class="detail-prod" th:text="${detail.Product_ref_code_id}"></span></td>
+            <td><span class="detail-col" th:text="${detail.Color_code_id}"></span></td>
+            <td><span class="detail-order" th:text="${detail.Order_code_id}"></span></td>
+
+            <td>
+                <button class="btn-action editBtn">Editar</button>
+                <button class="btn-action deleteBtn">Eliminar</button>
+                <button class="btn-action saveBtn" style="display:none;">Guardar</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <!-- Aquí termina la tabla -->
+
+    <script>
+
+            document.addEventListener("DOMContentLoaded", function () {
+            const detailTable = document.querySelector("table tbody");
+
+            detailTable.addEventListener("click", function (event) {
+            const target = event.target;
+
+            // Check if edit button was clicked
+            if (target.classList.contains("editBtn")) {
+            const detailRow = target.closest("tr");
+
+            // Hide edit buttons and show save button
+            detailRow.querySelector(".editBtn").style.display = "none";
+            detailRow.querySelector(".deleteBtn").style.display = "none";
+            detailRow.querySelector(".saveBtn").style.display = "";
+
+            // Enable field editing
+            detailRow.querySelectorAll("td").forEach(td => {
+            const span = td.querySelector("span");
+            if (span) {
+            const input = document.createElement("input");
+            input.value = span.textContent;
+            td.appendChild(input);
+            span.style.display = "none";
+        }
+        });
+        }
+
+            // Check if save button was clicked
+            if (target.classList.contains("saveBtn")) {
+            const detailRow = target.closest("tr");
+            const detailId = detailRow.querySelector(".detail-id").textContent;
+
+            // Check if all fields are filled
+            const inputs = detailRow.querySelectorAll("input");
+            for (const input of inputs) {
+            if (!input.value.trim()) {
+            alert("Please fill in all fields before saving.");
+            return; // Stop saving process if any field is empty
+        }
+        }
+
+            // Get edited values from the form
+            const editedDetail = {
+            opalDetail: inputs[1].value,
+            combinedDetail: inputs[2].value,
+            garmentDetail: inputs[3].value,
+            embroideryDetail: inputs[4].value,
+            embroideryLocation: inputs[5].value,
+            customerGroupCodeId: inputs[6].value,
+            productRefCodeId: inputs[7].value,
+            colorCodeId: inputs[8].value,
+            orderCodeId: inputs[9].value
+        };
+
+            // Send edited data to server to update the detail
+            fetch(`/api/detail/${detailId}`, {
+            method: "PUT",
+            headers: {
+            "Content-Type": "application/json"
+        },
+            body: JSON.stringify(editedDetail)
+        })
+            .then(response => {
+            if (!response.ok) {
+            throw new Error("Failed to update the detail.");
+        }
+            location.reload();
+        })
+            .catch(error => {
+            console.error("Error updating the detail:", error);
+        });
+        }
+
+            // Check if delete button was clicked
+            if (target.classList.contains("deleteBtn")) {
+            const detailRow = target.closest("tr");
+            const detailId = detailRow.querySelector(".detail-id").textContent;
+
+            // Confirm before deleting
+            if (confirm("Are you sure you want to delete this detail?")) {
+            // Send DELETE request to server
+            fetch(`/api/detail/${detailId}`, {
+            method: "DELETE"
+        })
+            .then(response => {
+            if (!response.ok) {
+            throw new Error("Error deleting the detail.");
+        }
+            detailRow.remove();
+        })
+            .catch(error => {
+            console.error("Error deleting the detail:", error);
+        });
+        }
+        }
+        });
+        });
+    </script>
+
+</body>
+
+</html>
